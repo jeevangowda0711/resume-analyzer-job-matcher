@@ -1,0 +1,21 @@
+services:
+  web:
+    build: .
+    container_name: fastapi-resume
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - mongo
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    dns:
+      - 8.8.8.8  # Google's DNS server
+  mongo:
+    image: mongo:latest
+    container_name: mongo-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-data:/data/db
