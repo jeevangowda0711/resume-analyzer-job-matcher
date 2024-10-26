@@ -4,9 +4,9 @@ pdfminer.six==20221105
 Pillow==9.5.0
 pytesseract==0.3.10
 nltk==3.8.1
-requests==2.31.0  # For handling HTTP requests to the Gemini API
-motor==3.2.0  # MongoDB connection
+requests==2.31.0
+motor==3.2.0
 pymongo==4.5.0
 python-multipart==0.0.12
-python-docx==0.8.11  # For handling Word files
+python-docx==0.8.11
 google-generativeai
