@@ -4,18 +4,18 @@ import pytesseract
 from io import BytesIO
 from PIL import Image
 import os
-import requests
-import nltk
+import google.generativeai as genai
 from typing import Dict
 
-# Define the Gemini API key
+# Configure Gemini API key
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if not GEMINI_API_KEY:
+    print("Warning: GEMINI_API_KEY is not set in the environment variables")
+else:
+    genai.configure(api_key=GEMINI_API_KEY)
 
-# Check if stopwords corpus is already downloaded, if not, download it
-try:
-    nltk.data.find('corpora/stopwords.zip')
-except LookupError:
-    nltk.download('stopwords')
+# Initialize the Gemini model
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 app = FastAPI(debug=True)
 
@@ -29,22 +29,11 @@ def read_root():
 
 # Function to call the Gemini API
 def call_gemini_api(text: str) -> Dict:
-    url = "https://gemini.api.flashmodel.com/v1/analyze"
-    headers = {
-        "Authorization": f"Bearer {GEMINI_API_KEY}",
-        "Content-Type": "application/json",
-    }
-    payload = {
-        "prompt": text,
-        "max_tokens": 500,
-        "temperature": 0.7,
-    }
-
-    response = requests.post(url, json=payload, headers=headers, timeout=30)
-    if response.status_code != 200:
-        raise HTTPException(status_code=500, detail=f"Gemini API error: {response.text}")
-
-    return response.json()
+    try:
+        response = model.generate_content(text)
+        return {"response_text": response.text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Gemini API error: {str(e)}")
 
 # Endpoint to upload and parse a resume
 @app.post("/upload-resume/")
